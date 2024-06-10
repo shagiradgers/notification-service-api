@@ -1,0 +1,4 @@
+server_host: "localhost"
+server_port: 8080
+vk_endpoint_value: "localhost:8081"
+telegram_endpoint_value: "localhost:8082"

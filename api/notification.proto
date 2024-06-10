@@ -1,0 +1,204 @@
+syntax = "proto3";
+
+package notification.v1;
+option go_package = "github.com/shagiradgers/notification-service-api/pkg/notification;notification";
+
+service notification_service {
+  rpc SendNotification(SendNotificationRequest) returns (SendNotificationResponse) {}
+  rpc GetNotificationData(GetNotificationDataRequest) returns (GetNotificationDataResponse) {}
+
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {}
+  rpc GetUser(GetUserRequest) returns(GetUserResponse) {}
+  rpc GetUserByFilter(GetUserByFilterRequest) returns(GetUserByFilterResponse) {}
+  rpc EditUser(EditUserRequest) returns (EditUserResponse) {}
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {}
+
+  rpc GetGroups(GetGroupsRequest) returns (GetGroupsResponse) {}
+}
+
+enum SocialNetwork {
+  TELEGRAM = 0;
+  VK = 1;
+}
+
+enum NotificationStatus {
+  CREATED = 0;
+  SEND = 1;
+  DELETED = 2;
+  PROBLEM = 3;
+}
+
+message SendNotificationRequest {
+  Notification notification = 2;
+}
+
+message SendNotificationResponse {
+  int64 notification_id = 1;
+  NotificationStatus message_status = 2;
+}
+
+message GetNotificationDataRequest {
+  int64 notification_id = 1;
+  SocialNetwork social_network = 2;
+}
+
+message GetNotificationDataResponse {
+  NotificationStatus notification_status = 1;
+  Notification notification = 2;
+}
+
+message Notification {
+  int64 sender_id = 1;
+  repeated int64 receiver_ids = 2;
+  string message = 3;
+  optional string media_content = 4;
+  SocialNetwork social_network = 5;
+}
+
+enum UserRole {
+  READER = 0;
+  WRITER = 1;
+}
+
+enum UserNotificationStatus {
+  ON = 0;
+  DISABLE = 1;
+}
+
+enum UserStatus {
+  ACTIVE = 0;
+  DISABLED = 1;
+}
+
+message FIO {
+  string firstname = 1;
+  string surname = 2;
+  optional string patronymic = 3;
+}
+
+message VkUser {
+  int64 user_id = 1;
+  int64 vk_id = 2;
+  UserRole user_role = 3;
+  string group = 4;
+  FIO fio = 5;
+  string mobile_phone = 6;
+  UserStatus user_status = 7;
+}
+
+message TelegramUser {
+  int64 user_id = 1;
+  int64 telegram_id = 2;
+  UserRole user_role = 3;
+  UserNotificationStatus user_notification_status = 4;
+  string group = 5;
+  FIO fio = 6;
+  string mobile_phone = 7;
+  UserStatus user_status = 8;
+}
+
+message CreateUserRequest {
+  oneof User {
+    TelegramUser telegram_user = 1;
+    VkUser vk_user = 2;
+  }
+
+  message TelegramUser {
+    int64 telegram_id = 1;
+    UserRole user_role = 2;
+    UserNotificationStatus user_notification_status = 3;
+    string group = 4;
+    FIO fio = 5;
+    string mobile_phone = 6;
+  }
+  message VkUser {
+    int64 vk_id = 1;
+    UserRole user_role = 2;
+    string group = 3;
+    FIO fio = 4;
+    string mobile_phone = 5;
+  }
+}
+
+message CreateUserResponse {
+  oneof user {
+    TelegramUser telegram_user = 1;
+    VkUser vk_user = 2;
+  }
+}
+
+message GetUserRequest {
+  int64 user_id = 1;
+  SocialNetwork social_network = 2;
+}
+
+message GetUserResponse {
+  oneof user {
+    TelegramUser telegram_user = 1;
+    VkUser vk_user = 2;
+  }
+}
+
+message GetUserByFilterRequest {
+  optional SocialNetwork social_network = 1;
+  optional int64 telegram_id = 2;
+  optional int64 vk_id = 3;
+  optional UserRole user_role = 4;
+  optional UserNotificationStatus user_notification_status = 5;
+  optional string group = 6;
+  optional string firstname = 7;
+  optional string surname = 8;
+  optional string patronymic = 9;
+  optional string mobile_phone = 10;
+  int64 limit = 11;
+  int64 offset = 12;
+}
+
+message GetUserByFilterResponse {
+  repeated TelegramUser telegram_user = 1;
+  repeated VkUser vk_user = 2;
+  int64 limit = 3;
+  int64 offset = 4;
+}
+
+message EditUserRequest {
+  int64 user_id = 1;
+  SocialNetwork social_network = 2;
+  optional int64 telegram_id = 3;
+  optional int64 vk_id = 4;
+  optional UserRole user_role = 5;
+  optional UserNotificationStatus user_notification_status = 6;
+  optional string group = 7;
+  optional string firstname = 8;
+  optional string surname = 9;
+  optional string patronymic = 10;
+  optional string mobile_phone = 11;
+}
+
+message EditUserResponse {
+  oneof user {
+    TelegramUser telegram_user = 1;
+    VkUser vk_user = 2;
+  }
+}
+
+message DeleteUserRequest {
+  int64 user_id = 1;
+  SocialNetwork social_network = 2;
+}
+
+message DeleteUserResponse {
+
+}
+
+message GetGroupsRequest {
+  optional SocialNetwork social_network = 1;
+  int64 limit = 2;
+  int64 offset = 3;
+}
+
+message GetGroupsResponse {
+  repeated string groups = 1;
+  int64 limit = 2;
+  int64 offset = 3;
+}
